@@ -20,6 +20,11 @@ gsap.registerPlugin(ScrollTrigger);
 /* ─── REDUCED MOTION DETECTION ────────────────────────────────────────── */
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* ─── DEVICE TIER ─────────────────────────────────────────────────────── */
+/* Desktop gets the full polished GSAP experience. Mobile gets safe fallbacks
+   that keep content visible without risking broken animations. */
+const isMobile = window.innerWidth < 768;
+
 /* ─── MAIN INIT ───────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   buildLetter();
@@ -92,6 +97,11 @@ function buildGallery() {
 function setupGalleryAnimations() {
   if (prefersReducedMotion) return;
   if (!CONFIG.photos || CONFIG.photos.length === 0) return;
+
+  // Mobile: skip ScrollTrigger entirely. Items are visible via CSS defaults.
+  // This prevents GSAP from setting opacity:0 on items that might never animate
+  // correctly if ScrollTrigger measurements are wrong on the first scroll.
+  if (isMobile) return;
 
   // Eyebrow "MEMORIES" slides up first
   gsap.from('#gallery-section .section-eyebrow', {
@@ -187,8 +197,9 @@ function buildVideoStrip() {
   }
 
   // Fill at least 1600px before duplicating so the scroll is visible
-  // even with very few videos. Each card is 200px + 16px gap = 216px.
-  var cardWidth = 216;
+  // even with very few videos. Desktop card = 220px + 16px gap = 236px;
+  // mobile card = 200px + 16px gap = 216px.
+  var cardWidth = isMobile ? 216 : 236;
   var setsPerHalf = Math.max(1, Math.ceil(1600 / (CONFIG.videos.length * cardWidth)));
 
   for (var i = 0; i < setsPerHalf; i++) {
@@ -240,9 +251,11 @@ function setupEnvelope() {
   const letterSection = document.getElementById('letter-section');
   const letterCard = document.getElementById('letter-card');
 
-  // Set GSAP initial states so elements start in the right position
+  // Set GSAP initial states so elements start in the right position.
+  // peek starts tucked inside the envelope; the y value accounts for the
+  // envelope height (208px desktop / 180px mobile) minus some overlap.
   gsap.set(flap, { transformOrigin: 'top center', transformPerspective: 600, rotationX: 0 });
-  gsap.set(peek, { y: 60, opacity: 0 });
+  gsap.set(peek, { y: isMobile ? 60 : 70, opacity: 0 });
   gsap.set(letterCard, { y: 80, opacity: 0 });
 
   let opened = false;
@@ -251,7 +264,10 @@ function setupEnvelope() {
     if (opened) return;
     opened = true;
 
-    if (prefersReducedMotion) {
+    // Mobile: skip the GSAP 3D sequence — just instant-reveal the letter.
+    // The envelope tap still feels intentional; the GSAP sequence is what caused
+    // flicker and timing issues on iPhone. Content remains fully accessible.
+    if (prefersReducedMotion || isMobile) {
       envelopeSection.classList.add('hidden');
       letterSection.classList.add('visible');
       gsap.set(letterCard, { y: 0, opacity: 1 });
@@ -463,7 +479,9 @@ function setupFinalMessageObserver() {
 function revealFinalWords() {
   const words = document.querySelectorAll('#final-message .word');
 
-  if (prefersReducedMotion) {
+  // Mobile: reveal all words at once. The stagger relies on IntersectionObserver
+  // firing at the right moment — on mobile scroll momentum this is unreliable.
+  if (prefersReducedMotion || isMobile) {
     words.forEach(function (w) { w.classList.add('visible'); });
     return;
   }
