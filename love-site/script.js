@@ -236,7 +236,7 @@ function buildVideoStrip() {
 /* Prepares word spans; animation triggered by Intersection Observer */
 function buildFinalMessage() {
   const el = document.getElementById('final-message');
-  const sentence = "I'm sorry. I love you. That will never change.";
+  const sentence = "Im sorry sayang :( i love you so much sayang. Sayang kamu hingga akhir hayat saya";
   const words = sentence.split(' ');
 
   words.forEach(function (word, i) {
