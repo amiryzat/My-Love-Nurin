@@ -5,13 +5,6 @@ const CONFIG = {
   recipientName: "Sayang",
   senderName: "Amir",
   letterText: `Dear Sayang,\n\nI know yesterday wasn't my best moment. I've been sitting with it and I want you to know I'm truly sorry. You deserve better from me and I promise I'm going to do better. You mean everything to me.`,
-  reasons: [
-    "The way you laugh at your own jokes before you finish telling them",
-    "How you always check if I've eaten when I'm too busy to remember",
-    "The way you look when you don't know I'm watching",
-    "That you put up with me even when I make it hard",
-    "Everything about you that I get to wake up knowing"
-  ],
   photos: [
     "photos/photo1.jpg",
     "photos/photo2.jpg"
@@ -38,14 +31,12 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 /* ─── MAIN INIT ───────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   buildLetter();
-  buildReasons();
   buildGallery();
   buildVideoStrip();
   buildFinalMessage();
   setupEnvelope();
   setupLightbox();
   setupVideoLightbox();
-  setupReasonObserver();
   setupGalleryAnimations();
   setupFinalMessageObserver();
 });
@@ -66,33 +57,6 @@ function buildLetter() {
   });
 }
 
-/* ─── BUILD REASONS ───────────────────────────────────────────────────── */
-/* Creates one card per reason from CONFIG.reasons */
-function buildReasons() {
-  const list = document.getElementById('reasons-list');
-
-  if (!CONFIG.reasons || CONFIG.reasons.length === 0) {
-    document.getElementById('reasons-section').classList.add('hidden-section');
-    return;
-  }
-
-  CONFIG.reasons.forEach(function (reason, index) {
-    const li = document.createElement('li');
-    li.className = 'reason-card';
-
-    const num = document.createElement('span');
-    num.className = 'reason-number';
-    num.textContent = (index + 1).toString().padStart(2, '0') + '.';
-
-    const text = document.createElement('p');
-    text.className = 'reason-text';
-    text.textContent = reason;
-
-    li.appendChild(num);
-    li.appendChild(text);
-    list.appendChild(li);
-  });
-}
 
 /* ─── BUILD GALLERY ───────────────────────────────────────────────────── */
 /* Builds photo strip from CONFIG.photos; hides section if empty */
@@ -479,33 +443,6 @@ function closeVideoLightbox() {
   if (track) track.classList.remove('paused');
 }
 
-/* ─── REASON CARDS OBSERVER ───────────────────────────────────────────── */
-/* Triggers fade-in animation for each reason card as it enters viewport */
-function setupReasonObserver() {
-  if (!window.IntersectionObserver) {
-    // Fallback: reveal all immediately
-    document.querySelectorAll('.reason-card').forEach(function (card) {
-      card.classList.add('revealed');
-    });
-    return;
-  }
-
-  const observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        if (prefersReducedMotion) {
-          entry.target.style.transition = 'none';
-        }
-        entry.target.classList.add('revealed');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
-
-  document.querySelectorAll('.reason-card').forEach(function (card) {
-    observer.observe(card);
-  });
-}
 
 /* ─── FINAL MESSAGE OBSERVER ──────────────────────────────────────────── */
 /* Triggers word-by-word reveal when the final section enters viewport */
