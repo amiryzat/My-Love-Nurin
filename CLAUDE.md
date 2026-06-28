@@ -129,3 +129,5 @@ If `CONFIG.photos` or `CONFIG.videos` is empty, that entire section is hidden (`
 |---|---|
 | 2026-06-28 | Initial build — single `index.html` |
 | 2026-06-28 | Split into `index.html` + `style.css` + `script.js` |
+| 2026-06-28 | Replaced CSS transition envelope animation with GSAP timeline. `#envelope-section` is now `position: fixed; z-index: 100` overlay. GSAP owns all transforms on `flap`, `peek`, `letterCard`, and `envelopeSection` — no CSS transitions on those elements. Sequence: flap rotates open → peek rises → envelope slides off top of viewport → letter card rises up. GSAP loaded from cdnjs. |
+| 2026-06-28 | Added GSAP ScrollTrigger scroll-reveal to gallery section. Eyebrow fades up → title slides in → photo cards stagger up with scale (0.93→1). ScrollTrigger loaded from cdnjs. `setupGalleryAnimations()` runs after `buildGallery()` so items exist in DOM. |

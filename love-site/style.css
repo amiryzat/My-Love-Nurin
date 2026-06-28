@@ -27,13 +27,15 @@ body {
 }
 
 /* ─── SECTION 1: ENVELOPE LANDING ─────────────────────────────────────── */
+/* Fixed so it overlays the rest of the page; GSAP slides it off on open */
 #envelope-section {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
   background-color: #F7F0E6;
 }
 
@@ -107,16 +109,14 @@ body {
   z-index: 1;
 }
 
-/* Top flap — this rotates open */
+/* Top flap — GSAP animates rotationX, no CSS transition needed */
 .envelope-flap {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 3;
-  transform-origin: top center;
   transform-style: preserve-3d;
-  transition: transform 0.6s ease-in-out;
 }
 
 .envelope-flap::before {
@@ -127,11 +127,6 @@ body {
   border-left: 130px solid transparent;
   border-right: 130px solid transparent;
   border-top: 100px solid #DBC8B0;
-}
-
-/* Flap open state */
-.envelope-flap.open {
-  transform: rotateX(-180deg);
 }
 
 /* Wax seal in center of envelope */
@@ -176,24 +171,16 @@ body {
   transform-origin: 100% 100%;
 }
 
-/* Letter peeking out during open animation */
+/* Letter peeking out — GSAP controls y and opacity, left centers it manually */
 .envelope-letter-peek {
   position: absolute;
   bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%) translateY(60px);
+  left: 20px; /* (260px envelope − 220px peek) / 2 */
   width: 220px;
   height: 140px;
   background-color: #FDF6EC;
   border-radius: 4px;
   z-index: 2;
-  opacity: 0;
-  transition: transform 0.8s ease-out 0.4s, opacity 0.8s ease-out 0.4s;
-}
-
-.envelope-letter-peek.visible {
-  transform: translateX(-50%) translateY(-20px);
-  opacity: 1;
 }
 
 /* Tap prompt */
@@ -210,14 +197,7 @@ body {
   50%       { opacity: 1; }
 }
 
-/* Envelope section fade-out */
-#envelope-section.fade-out {
-  opacity: 0;
-  transform: scale(0.8);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  pointer-events: none;
-}
-
+/* Hidden after GSAP exit animation completes */
 #envelope-section.hidden {
   display: none;
 }
@@ -237,6 +217,7 @@ body {
   display: flex;
 }
 
+/* GSAP sets initial opacity/y and animates to final state */
 .letter-card {
   background-color: #FDF6EC;
   border-radius: 12px;
@@ -244,14 +225,6 @@ body {
   padding: 40px 32px;
   max-width: 480px;
   width: 100%;
-  opacity: 0;
-  transform: translateY(60px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.letter-card.revealed {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .letter-to {
@@ -632,7 +605,7 @@ body {
   display: flex;
   gap: 16px;
   width: max-content;
-  animation: marquee 25s linear infinite;
+  animation: marquee 45s linear infinite;
 }
 
 .video-marquee-track.paused {

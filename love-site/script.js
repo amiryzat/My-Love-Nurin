@@ -2,9 +2,9 @@
    This is the only block you need to edit to personalise the site.
 ─────────────────────────────────────────────────────────────────────────── */
 const CONFIG = {
-  recipientName: "Sarah",
+  recipientName: "Sayang",
   senderName: "Amir",
-  letterText: `Dear Sarah,\n\nI know yesterday wasn't my best moment. I've been sitting with it and I want you to know I'm truly sorry. You deserve better from me and I promise I'm going to do better. You mean everything to me.`,
+  letterText: `Dear Sayang,\n\nI know yesterday wasn't my best moment. I've been sitting with it and I want you to know I'm truly sorry. You deserve better from me and I promise I'm going to do better. You mean everything to me.`,
   reasons: [
     "The way you laugh at your own jokes before you finish telling them",
     "How you always check if I've eaten when I'm too busy to remember",
@@ -14,18 +14,23 @@ const CONFIG = {
   ],
   photos: [
     "photos/photo1.jpg",
-    "photos/photo2.jpg",
-    "photos/photo3.jpg",
-    "photos/photo4.jpg",
-    "photos/photo5.jpg",
-    "photos/photo6.jpg"
+    "photos/photo2.jpg"
   ],
   videos: [
-    "videos/video1.mp4",
-    "videos/video2.mp4",
-    "videos/video3.mp4"
+    "videos/video1.mp4"
   ]
 };
+
+/* ─── SCROLL RESTORATION ──────────────────────────────────────────────── */
+/* Tell the browser not to restore scroll position on reload.
+   We reset scroll ourselves at tap-time (inside openEnvelope) so the
+   envelope is still covering the page when the jump happens — invisible. */
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
+/* ─── GSAP PLUGINS ────────────────────────────────────────────────────── */
+gsap.registerPlugin(ScrollTrigger);
 
 /* ─── REDUCED MOTION DETECTION ────────────────────────────────────────── */
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -41,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
   setupLightbox();
   setupVideoLightbox();
   setupReasonObserver();
+  setupGalleryAnimations();
   setupFinalMessageObserver();
 });
 
@@ -120,6 +126,55 @@ function buildGallery() {
   });
 }
 
+/* ─── GALLERY SCROLL ANIMATIONS ──────────────────────────────────────── */
+/* GSAP ScrollTrigger: header wipes in, then photos stagger up on scroll */
+function setupGalleryAnimations() {
+  if (prefersReducedMotion) return;
+  if (!CONFIG.photos || CONFIG.photos.length === 0) return;
+
+  // Eyebrow "MEMORIES" slides up first
+  gsap.from('#gallery-section .section-eyebrow', {
+    scrollTrigger: {
+      trigger: '#gallery-section',
+      start: 'top 82%',
+      once: true
+    },
+    y: 18,
+    opacity: 0,
+    duration: 0.55,
+    ease: 'power2.out'
+  });
+
+  // "Us." title drops in after eyebrow
+  gsap.from('#gallery-section .section-title', {
+    scrollTrigger: {
+      trigger: '#gallery-section',
+      start: 'top 82%',
+      once: true
+    },
+    y: 50,
+    opacity: 0,
+    duration: 0.85,
+    ease: 'power3.out',
+    delay: 0.14
+  });
+
+  // Photo cards stagger up with a subtle scale, triggered when strip enters view
+  gsap.from('.photo-item', {
+    scrollTrigger: {
+      trigger: '.photo-strip',
+      start: 'top 88%',
+      once: true
+    },
+    y: 55,
+    opacity: 0,
+    scale: 0.93,
+    duration: 0.72,
+    stagger: 0.1,
+    ease: 'power3.out'
+  });
+}
+
 /* ─── BUILD VIDEO STRIP ───────────────────────────────────────────────── */
 /* Builds the infinite marquee strip; duplicates the list for seamless loop */
 function buildVideoStrip() {
@@ -167,9 +222,18 @@ function buildVideoStrip() {
     });
   }
 
-  // Add two copies so the CSS marquee loops seamlessly
-  buildSet().forEach(function (card) { track.appendChild(card); });
-  buildSet().forEach(function (card) { track.appendChild(card); });
+  // Fill at least 1600px before duplicating so the scroll is visible
+  // even with very few videos. Each card is 200px + 16px gap = 216px.
+  var cardWidth = 216;
+  var setsPerHalf = Math.max(1, Math.ceil(1600 / (CONFIG.videos.length * cardWidth)));
+
+  for (var i = 0; i < setsPerHalf; i++) {
+    buildSet().forEach(function (card) { track.appendChild(card); });
+  }
+  // Identical second half — CSS translateX(-50%) lands exactly on loop point
+  for (var j = 0; j < setsPerHalf; j++) {
+    buildSet().forEach(function (card) { track.appendChild(card); });
+  }
 
   // Pause on hover/touch, resume on leave
   const container = document.getElementById('video-marquee-container');
@@ -205,7 +269,7 @@ function buildFinalMessage() {
 }
 
 /* ─── ENVELOPE OPEN SEQUENCE ──────────────────────────────────────────── */
-/* Handles the multi-step envelope open animation */
+/* GSAP timeline: flap flips → letter peeks → envelope slides off top → letter rises */
 function setupEnvelope() {
   const envelope = document.getElementById('envelope');
   const wrapper = document.getElementById('envelope-wrapper');
@@ -215,51 +279,75 @@ function setupEnvelope() {
   const letterSection = document.getElementById('letter-section');
   const letterCard = document.getElementById('letter-card');
 
+  // Set GSAP initial states so elements start in the right position
+  gsap.set(flap, { transformOrigin: 'top center', transformPerspective: 600, rotationX: 0 });
+  gsap.set(peek, { y: 60, opacity: 0 });
+  gsap.set(letterCard, { y: 80, opacity: 0 });
+
   let opened = false;
 
   function openEnvelope() {
     if (opened) return;
     opened = true;
 
+    // Reset scroll NOW — envelope is still fully covering the page so
+    // the jump is invisible. Everything below will be at position 0
+    // when the envelope slides away.
+    window.scrollTo(0, 0);
+
     if (prefersReducedMotion) {
-      // Skip directly to letter
       envelopeSection.classList.add('hidden');
       letterSection.classList.add('visible');
-      letterCard.classList.add('revealed');
+      gsap.set(letterCard, { y: 0, opacity: 1 });
       showScrollIndicator();
       return;
     }
 
-    // Step 1: Stop bob animation, open the flap
+    // Stop the CSS bob animation
     wrapper.classList.add('opening');
-    flap.classList.add('open');
 
-    // Step 2: Letter peek slides up after 0.4s
-    setTimeout(function () {
-      peek.classList.add('visible');
-    }, 400);
+    const tl = gsap.timeline();
 
-    // Step 3: Show letter section, then fade envelope out after letter appears
-    setTimeout(function () {
+    // 1. Flap rotates open with a 3D flip
+    tl.to(flap, {
+      rotationX: -180,
+      duration: 0.65,
+      ease: 'power2.inOut'
+    })
+
+    // 2. Letter peeks up from inside the envelope (overlaps with flap end)
+    .to(peek, {
+      y: -30,
+      opacity: 1,
+      duration: 0.55,
+      ease: 'back.out(1.4)'
+    }, '-=0.3')
+
+    // 3. Brief hold so the peek reads, then reveal the letter section
+    .add(function () {
       letterSection.classList.add('visible');
-      // Slight stagger then reveal the card
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          letterCard.classList.add('revealed');
-        });
-      });
+    }, '+=0.2')
 
-      // Fade and shrink envelope
-      setTimeout(function () {
-        envelopeSection.classList.add('fade-out');
-        setTimeout(function () {
-          envelopeSection.classList.add('hidden');
-        }, 500);
-      }, 300);
+    // 4. Envelope slides UP off the viewport — the main exit move
+    .to(envelopeSection, {
+      y: '-100vh',
+      duration: 0.85,
+      ease: 'power3.inOut',
+      onComplete: function () {
+        envelopeSection.classList.add('hidden');
+      }
+    })
 
-      // Show scroll indicator after letter is comfortably visible
-      setTimeout(showScrollIndicator, 1500);
-    }, 1200);
+    // 5. Letter card rises up as the envelope lifts away (overlaps the exit)
+    .to(letterCard, {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power3.out'
+    }, '-=0.6')
+
+    // 6. Scroll indicator after everything settles
+    .call(showScrollIndicator, null, '+=0.8');
   }
 
   envelope.addEventListener('click', openEnvelope);
