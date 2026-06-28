@@ -15,6 +15,14 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Must run before any layout or scroll restoration happens.
+       Placing this in <head> guarantees it fires before the browser
+       can jump to a saved scroll position on reload. -->
+  <script>
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  </script>
 </head>
 <body>
 

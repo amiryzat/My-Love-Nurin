@@ -46,10 +46,13 @@ body {
   align-items: center;
   gap: 28px;
   animation: envelope-bob 3s ease-in-out infinite;
+  /* GPU layer hint — prevents iOS from dropping it mid-animation */
+  will-change: transform;
 }
 
 .envelope-wrapper.opening {
   animation: none;
+  will-change: auto;
 }
 
 @keyframes envelope-bob {
@@ -66,6 +69,8 @@ body {
   border-radius: 4px;
   box-shadow: 0 6px 30px rgba(0,0,0,0.15);
   cursor: pointer;
+  /* Both prefixed and unprefixed for full iOS Safari coverage */
+  -webkit-perspective: 600px;
   perspective: 600px;
 }
 
@@ -109,14 +114,20 @@ body {
   z-index: 1;
 }
 
-/* Top flap — GSAP animates rotationX, no CSS transition needed */
+/* Top flap — GSAP animates rotationX.
+   backface-visibility: hidden stops iOS from showing the back face
+   during the 3D rotation, which caused a white flash. */
 .envelope-flap {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 3;
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .envelope-flap::before {
@@ -181,6 +192,7 @@ body {
   background-color: #FDF6EC;
   border-radius: 4px;
   z-index: 2;
+  will-change: transform, opacity;
 }
 
 /* Tap prompt */
@@ -205,7 +217,9 @@ body {
 /* ─── SECTION 2: THE LETTER ────────────────────────────────────────────── */
 #letter-section {
   display: none;
+  /* 100svh respects the iOS address bar; 100vh as fallback for older Safari */
   min-height: 100vh;
+  min-height: 100svh;
   padding: 40px 20px 80px;
   background-color: #F7F0E6;
   align-items: center;
@@ -225,6 +239,8 @@ body {
   padding: 40px 32px;
   max-width: 480px;
   width: 100%;
+  /* GPU layer hint for GSAP opacity + y animation */
+  will-change: transform, opacity;
 }
 
 .letter-to {
@@ -346,7 +362,6 @@ body {
   color: #1A1A1A;
 }
 
-
 /* ─── SECTION 4: PHOTO GALLERY ─────────────────────────────────────────── */
 #gallery-section {
   padding: 80px 0;
@@ -385,6 +400,8 @@ body {
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
+  /* GPU hint for GSAP stagger animation */
+  will-change: transform, opacity;
 }
 
 .photo-item img {
@@ -553,15 +570,20 @@ body {
   gap: 16px;
   width: max-content;
   animation: marquee 45s linear infinite;
+  /* Force GPU compositing on iOS so the CSS animation runs on the compositor
+     thread and isn't blocked by JS or layout recalculations */
+  will-change: transform;
 }
 
 .video-marquee-track.paused {
   animation-play-state: paused;
 }
 
+/* translateZ(0) in both keyframe stops forces the browser to keep
+   the element on the GPU layer throughout the animation on iOS */
 @keyframes marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0%   { transform: translateX(0) translateZ(0); }
+  100% { transform: translateX(-50%) translateZ(0); }
 }
 
 .video-card {
@@ -648,7 +670,9 @@ body {
 
 /* ─── SECTION 6: FINAL MESSAGE ──────────────────────────────────────────── */
 #final-section {
+  /* 100svh respects the iOS address bar; 100vh as fallback */
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;

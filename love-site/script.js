@@ -14,14 +14,6 @@ const CONFIG = {
   ]
 };
 
-/* ─── SCROLL RESTORATION ──────────────────────────────────────────────── */
-/* Tell the browser not to restore scroll position on reload.
-   We reset scroll ourselves at tap-time (inside openEnvelope) so the
-   envelope is still covering the page when the jump happens — invisible. */
-if ('scrollRestoration' in history) {
-  history.scrollRestoration = 'manual';
-}
-
 /* ─── GSAP PLUGINS ────────────────────────────────────────────────────── */
 gsap.registerPlugin(ScrollTrigger);
 
@@ -41,6 +33,12 @@ document.addEventListener('DOMContentLoaded', function () {
   setupFinalMessageObserver();
 });
 
+/* Refresh ScrollTrigger after everything (fonts, images) has loaded so its
+   scroll position measurements are accurate on iOS. */
+window.addEventListener('load', function () {
+  ScrollTrigger.refresh();
+});
+
 /* ─── BUILD LETTER ────────────────────────────────────────────────────── */
 /* Populates the letter card from CONFIG */
 function buildLetter() {
@@ -56,7 +54,6 @@ function buildLetter() {
     body.appendChild(p);
   });
 }
-
 
 /* ─── BUILD GALLERY ───────────────────────────────────────────────────── */
 /* Builds photo strip from CONFIG.photos; hides section if empty */
@@ -162,8 +159,11 @@ function buildVideoStrip() {
       vid.muted = true;
       vid.loop = true;
       vid.playsInline = true;
-      vid.setAttribute('playsinline', '');
+      // Both attribute and property forms needed for iOS Safari
+      vid.setAttribute('autoplay', '');
       vid.setAttribute('muted', '');
+      vid.setAttribute('loop', '');
+      vid.setAttribute('playsinline', '');
 
       const overlay = document.createElement('div');
       overlay.className = 'video-play-overlay';
@@ -177,7 +177,7 @@ function buildVideoStrip() {
       card.appendChild(vid);
       card.appendChild(overlay);
 
-      // Open video lightbox on click
+      // Open video lightbox on click/tap
       card.addEventListener('click', function () {
         openVideoLightbox(src);
       });
@@ -199,19 +199,16 @@ function buildVideoStrip() {
     buildSet().forEach(function (card) { track.appendChild(card); });
   }
 
-  // Pause on hover/touch, resume on leave
-  const container = document.getElementById('video-marquee-container');
+  // Desktop hover: pause marquee while mouse is over it.
+  // Touch events are intentionally NOT used here — on iOS, touchstart fires
+  // during vertical page scroll (finger passes over the strip) and
+  // touchcancel fires instead of touchend when the scroll gesture is captured,
+  // permanently freezing the marquee. Tapping a card triggers click directly.
+  var container = document.getElementById('video-marquee-container');
   container.addEventListener('mouseenter', function () {
     track.classList.add('paused');
   });
   container.addEventListener('mouseleave', function () {
-    // Only resume if video lightbox is closed
-    if (!videoLightboxOpen) track.classList.remove('paused');
-  });
-  container.addEventListener('touchstart', function () {
-    track.classList.add('paused');
-  }, { passive: true });
-  container.addEventListener('touchend', function () {
     if (!videoLightboxOpen) track.classList.remove('paused');
   });
 }
@@ -254,11 +251,6 @@ function setupEnvelope() {
     if (opened) return;
     opened = true;
 
-    // Reset scroll NOW — envelope is still fully covering the page so
-    // the jump is invisible. Everything below will be at position 0
-    // when the envelope slides away.
-    window.scrollTo(0, 0);
-
     if (prefersReducedMotion) {
       envelopeSection.classList.add('hidden');
       letterSection.classList.add('visible');
@@ -292,9 +284,11 @@ function setupEnvelope() {
       letterSection.classList.add('visible');
     }, '+=0.2')
 
-    // 4. Envelope slides UP off the viewport — the main exit move
+    // 4. Envelope slides UP off the viewport — use window.innerHeight in pixels
+    //    instead of '-100vh' because iOS Safari measures vh differently when
+    //    the address bar is visible vs hidden, which could leave a sliver.
     .to(envelopeSection, {
-      y: '-100vh',
+      y: -(window.innerHeight + 100),
       duration: 0.85,
       ease: 'power3.inOut',
       onComplete: function () {
@@ -442,7 +436,6 @@ function closeVideoLightbox() {
   videoLightboxOpen = false;
   if (track) track.classList.remove('paused');
 }
-
 
 /* ─── FINAL MESSAGE OBSERVER ──────────────────────────────────────────── */
 /* Triggers word-by-word reveal when the final section enters viewport */
