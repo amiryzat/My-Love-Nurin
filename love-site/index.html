@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Sarah</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 1: ENVELOPE LANDING                                            -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="envelope-section" aria-label="Open the letter">
+    <div class="envelope-wrapper" id="envelope-wrapper">
+
+      <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Click to open">
+        <!-- Flap that rotates open -->
+        <div class="envelope-flap" id="envelope-flap"></div>
+        <!-- Side panels -->
+        <div class="envelope-left"></div>
+        <div class="envelope-right"></div>
+        <!-- Wax seal -->
+        <div class="envelope-seal"></div>
+        <!-- Letter peek that slides up during animation -->
+        <div class="envelope-letter-peek" id="letter-peek"></div>
+      </div>
+
+      <p class="tap-prompt">tap to open</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 2: THE LETTER                                                  -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="letter-section" aria-label="The letter">
+    <div class="letter-card" id="letter-card">
+      <p class="letter-to" id="letter-to"></p>
+      <div class="letter-body" id="letter-body"></div>
+      <p class="letter-signature" id="letter-signature"></p>
+      <div class="letter-heart">
+        <div class="heart-shape" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- Scroll indicator appears after letter is read -->
+    <div class="scroll-indicator" id="scroll-indicator" aria-hidden="true">
+      <div class="scroll-chevron"></div>
+      <span>keep scrolling</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 3: REASONS                                                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="reasons-section" aria-label="Reasons I love you">
+    <div class="reasons-header">
+      <span class="section-eyebrow">for you</span>
+      <h2 class="section-title">Some things I never want you to forget</h2>
+    </div>
+    <!-- Reason cards injected by JS -->
+    <ul class="reasons-list" id="reasons-list"></ul>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 4: PHOTO GALLERY                                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="gallery-section" aria-label="Our photos">
+    <div class="gallery-header">
+      <span class="section-eyebrow">memories</span>
+      <h2 class="section-title">Us.</h2>
+    </div>
+    <!-- Photo items injected by JS -->
+    <div class="photo-strip" id="photo-strip" role="list"></div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- Photo Lightbox                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <button class="lightbox-btn lightbox-prev" id="lb-prev" aria-label="Previous photo">
+      <span class="chevron-left"></span>
+    </button>
+    <img id="lightbox-img" src="" alt="" />
+    <button class="lightbox-btn lightbox-next" id="lb-next" aria-label="Next photo">
+      <span class="chevron-right"></span>
+    </button>
+    <button class="lightbox-btn lightbox-close" id="lb-close" aria-label="Close">
+      <span class="chevron-x"></span>
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 5: VIDEO STRIP                                                 -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="video-section" aria-label="Our videos">
+    <div class="video-header">
+      <span class="section-eyebrow">us, moving</span>
+      <h2 class="section-title">Moments.</h2>
+    </div>
+    <div class="video-marquee-container" id="video-marquee-container">
+      <!-- Video track injected by JS (duplicated for seamless loop) -->
+      <div class="video-marquee-track" id="video-marquee-track"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- Video Lightbox                                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="video-lightbox" role="dialog" aria-modal="true" aria-label="Video viewer">
+    <video id="video-lightbox-player" controls></video>
+    <button class="lightbox-btn video-lightbox-close" id="vl-close" aria-label="Close video">
+      <span class="chevron-x"></span>
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 6: FINAL MESSAGE                                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <section id="final-section" aria-label="Final message">
+    <p class="final-message" id="final-message" aria-label="I'm sorry. I love you. That will never change."></p>
+    <div class="final-heart-wrapper" aria-hidden="true">
+      <div class="heart-beat"></div>
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+
+</body>
+</html>
+
+<!--
+FOLDER STRUCTURE:
+/love-site
+  index.html        (this file)
+  /photos
+    photo1.jpg
+    photo2.jpg
+    photo3.jpg
+    photo4.jpg
+    photo5.jpg
+    photo6.jpg      (match filenames to CONFIG.photos)
+  /videos
+    video1.mp4
+    video2.mp4
+    video3.mp4      (match filenames to CONFIG.videos)
+
+TO DEPLOY:
+1. Put your photos in /love-site/photos/ and videos in /love-site/videos/
+2. Go to netlify.com, click "Add new site" → "Deploy manually"
+3. Drag the entire /love-site folder into the deploy box
+4. Send her the link
+-->
