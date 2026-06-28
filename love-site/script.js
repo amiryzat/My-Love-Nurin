@@ -18,6 +18,10 @@ const CONFIG = {
   ]
 };
 
+// Expose CONFIG for circular-gallery.js (an ES module — it can't share
+// const-scope variables with regular scripts, only window properties)
+window.__loveConfig = CONFIG;
+
 /* ─── GSAP PLUGINS ────────────────────────────────────────────────────── */
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,13 +36,13 @@ const isMobile = window.innerWidth < 768;
 /* ─── MAIN INIT ───────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', function () {
   buildLetter();
-  buildGallery();
+  // buildGallery() removed — photo section now uses CircularGallery (circular-gallery.js)
   buildVideoStrip();
   buildFinalMessage();
   setupEnvelope();
-  setupLightbox();
+  // setupLightbox() removed — lightbox HTML is removed; CircularGallery handles its own interaction
   setupVideoLightbox();
-  setupGalleryAnimations();
+  setupGalleryAnimations();  // still runs header eyebrow + title animations
   setupFinalMessageObserver();
 });
 

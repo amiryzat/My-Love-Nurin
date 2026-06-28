@@ -750,6 +750,38 @@ body {
   100% { transform: scale(1.15); }
 }
 
+/* ─── CIRCULAR GALLERY ──────────────────────────────────────────────────── */
+/* Container height drives the WebGL canvas size. The canvas fills 100% of it. */
+#circular-gallery-container {
+  width: 100%;
+  height: 500px;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  #circular-gallery-container {
+    height: 620px;
+  }
+}
+
+/* Applied in JS after the container is ready */
+.circular-gallery {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  outline: none;
+}
+
+.circular-gallery:active {
+  cursor: grabbing;
+}
+
+.circular-gallery:focus-visible {
+  outline: 2px solid #C97B7B;
+  outline-offset: 4px;
+}
+
 /* ─── UTILITY ───────────────────────────────────────────────────────────── */
 .hidden-section {
   display: none !important;

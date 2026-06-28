@@ -69,32 +69,16 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- SECTION 4: PHOTO GALLERY                                               -->
+  <!-- SECTION 4: PHOTO GALLERY (CircularGallery WebGL component)             -->
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <section id="gallery-section" aria-label="Our photos">
     <div class="gallery-header">
       <span class="section-eyebrow">memories</span>
       <h2 class="section-title">Us.</h2>
     </div>
-    <!-- Photo items injected by JS -->
-    <div class="photo-strip" id="photo-strip" role="list"></div>
+    <!-- circular-gallery.js mounts the WebGL canvas here -->
+    <div id="circular-gallery-container"></div>
   </section>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- Photo Lightbox                                                          -->
-  <!-- ═══════════════════════════════════════════════════════════════════════ -->
-  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
-    <button class="lightbox-btn lightbox-prev" id="lb-prev" aria-label="Previous photo">
-      <span class="chevron-left"></span>
-    </button>
-    <img id="lightbox-img" src="" alt="" />
-    <button class="lightbox-btn lightbox-next" id="lb-next" aria-label="Next photo">
-      <span class="chevron-right"></span>
-    </button>
-    <button class="lightbox-btn lightbox-close" id="lb-close" aria-label="Close">
-      <span class="chevron-x"></span>
-    </button>
-  </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════ -->
   <!-- SECTION 5: VIDEO STRIP                                                 -->
@@ -133,8 +117,10 @@
   <!-- GSAP + ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <!-- Scripts -->
+  <!-- Main scripts (regular script — runs synchronously, sets window.__loveConfig) -->
   <script src="script.js"></script>
+  <!-- Circular gallery (ES module — deferred, imports ogl from CDN) -->
+  <script type="module" src="circular-gallery.js"></script>
 
 </body>
 </html>
