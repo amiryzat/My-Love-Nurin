@@ -7,7 +7,11 @@ const CONFIG = {
   letterText: `Dear Sayang,\n\nI know yesterday wasn't my best moment. I've been sitting with it and I want you to know I'm truly sorry. You deserve better from me and I promise I'm going to do better. You mean everything to me.`,
   photos: [
     "photos/photo1.jpg",
-    "photos/photo2.jpg"
+    "photos/photo2.jpg",
+    "photos/photo3.jpg",
+    "photos/photo4.jpg",
+    "photos/photo5.jpg",
+    "photos/photo6.jpg"
   ],
   videos: [
     "videos/video1.mp4"
