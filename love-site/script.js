@@ -4,7 +4,7 @@
 const CONFIG = {
   recipientName: "Sayang",
   senderName: "Amir",
-  letterText: `Dear Sayang,\n\nSayang, saya minta maaf dengan apa yang jadi semalam, sejujurnya memang salah saya sebab tak bagi kamu ruang untuk explain and just bertindak ikut emosi saya, saya minta maaf sangat ii sayang.\n\nSaya harap, sayang kamu tak berkurang dekat saya lepas apa yang jadi.. Saya janji dengan kamu, saya akan jadi lebih baik untuk kamu sayang ya, I love you soo much sayang ❤️`,
+  letterText: `Dear Sayang,\n\nSayang, saya minta maaf dengan apa yang jadi semalam, sejujurnya memang salah saya sebab tak bagi kamu ruang untuk explain and just bertindak ikut emosi saya, saya minta maaf sangat ii sayang.\n\nSaya harap, sayang kamu tak berkurang dekat saya lepas apa yang jadi.. Saya janji dengan kamu, saya akan jadi lebih baik untuk kamu sayang ya, and if sayang still ada rasa sayang sikittt pun dekat saya, I hope we can work on this together and I want you to know that you're the one I want to be with for the rest of my life. I love you soo much sayang. ❤️`,
   photos: [
     "photos/photo1.jpg",
     "photos/photo2.jpg",
@@ -17,7 +17,11 @@ const CONFIG = {
     "photos/photo9.jpg"
   ],
   videos: [
-    "videos/video1.mp4"
+    "videos/video1.mp4",
+    "videos/video2.mp4",
+    "videos/video3.mp4",
+    "videos/video4.mp4",
+    "videos/video5.mp4"
   ]
 };
 
